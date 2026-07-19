@@ -2,15 +2,15 @@
   "name": "api_pescado",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "types": "module",
+  "main": "src/index.js",
   "scripts": {
+    "start": "node src/index.js",
     "dev": "node src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "express": "^5.2.1",
     "streamifier": "^0.1.1"
