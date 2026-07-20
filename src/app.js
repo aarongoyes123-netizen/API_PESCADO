@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 // RUTAS
-app.use('/api/imagen', imagenRoutes);
+app.use('/imagen', imagenRoutes);
 // 404
 app.use((req, res) => {
   res.status(404).json({
