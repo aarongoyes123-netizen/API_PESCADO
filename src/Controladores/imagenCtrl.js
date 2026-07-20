@@ -39,46 +39,28 @@ function ejecutarModelo(rutaImagen) {
 
 export const subirImagen = async (req, res) => {
 
-    try {
-
-        if (!req.file) {
-            return res.status(400).json({
-                mensaje: 'No se envió ninguna imagen'
-            });
-        }
-
-        // Ejecutar el modelo de IA
-        const resultadoModelo = await ejecutarModelo(req.file.path);
-
-        // Subir la imagen a Cloudinary
-        const resultadoCloudinary = await cloudinary.uploader.upload(
-            req.file.path,
-            {
-                folder: 'API_PESCADO'
-            }
-        );
-
-        // Respuesta
-        res.status(200).json({
-
-            mensaje: 'Imagen subida correctamente',
-
-            url: resultadoCloudinary.secure_url,
-
-            public_id: resultadoCloudinary.public_id,
-
-            analisis: resultadoModelo
-
+    if (!req.file) {
+        return res.status(400).json({
+            mensaje: "No hay imagen"
         });
-
-    } catch (error) {
-
-        console.error(error);
-
-        res.status(500).json({
-            mensaje: error.message
-        });
-
     }
+
+
+    // responder inmediatamente
+    res.status(200).json({
+        mensaje: "Imagen recibida",
+        estado: "procesando"
+    });
+
+
+    // ejecutar después
+    ejecutarModelo(req.file.path)
+        .then(resultado => {
+            console.log(resultado);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+
 
 };
