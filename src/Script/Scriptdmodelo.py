@@ -3,42 +3,38 @@ import json
 import cv2
 import numpy as np
 
+print("Python iniciado", flush=True)
+
 from ultralytics import YOLO
+
+print("YOLO importado", flush=True)
+
 from tensorflow.keras.models import load_model
 
-# ==========================
-# CARGAR LOS MODELOS
-# ==========================
+print("TensorFlow importado", flush=True)
+
+
+print("Cargando YOLO...", flush=True)
 
 modelo_yolo = YOLO("src/modelos/best.pt")
+
+print("YOLO cargado", flush=True)
+
+
+print("Cargando clasificación...", flush=True)
 
 modelo_clasificacion = load_model(
     "src/modelos/modelo_clasificacion.keras"
 )
 
+print("Clasificador cargado", flush=True)
 # Clases del modelo de clasificación
 class_names = [
     "deteriorado",
     "fresco",
     "regular"
 ]
-# ==========================
-# CLASIFICADOR
-# ==========================
 
-def clasificar_imagen(imagen):
-
-    imagen = cv2.resize(imagen, (224, 224))
-
-    imagen = np.expand_dims(imagen, axis=0)
-
-    pred = modelo_clasificacion.predict(imagen, verbose=0)
-
-    indice = np.argmax(pred)
-
-    confianza = float(np.max(pred))
-
-    return class_names[indice], confianza
 # ==========================
 # CLASIFICADOR
 # ==========================

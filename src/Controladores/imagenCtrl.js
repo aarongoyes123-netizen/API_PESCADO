@@ -13,7 +13,11 @@ function ejecutarModelo(rutaImagen) {
         let error = '';
 
         python.stdout.on('data', (data) => {
+
+            console.log("PYTHON:", data.toString());
+
             salida += data.toString();
+
         });
 
         python.stderr.on('data', (data) => {
@@ -37,18 +41,18 @@ function ejecutarModelo(rutaImagen) {
     });
 }
 
-export const subirImagen = async (req,res)=>{
+export const subirImagen = async (req, res) => {
 
     try {
 
         console.log("1. Entró al controlador");
 
 
-        if(!req.file){
+        if (!req.file) {
             console.log("No llegó archivo");
 
             return res.status(400).json({
-                mensaje:"No hay imagen"
+                mensaje: "No hay imagen"
             });
         }
 
@@ -59,8 +63,8 @@ export const subirImagen = async (req,res)=>{
 
 
         res.status(200).json({
-            mensaje:"Imagen recibida",
-            estado:"procesando"
+            mensaje: "Imagen recibida",
+            estado: "procesando"
         });
 
 
@@ -78,7 +82,7 @@ export const subirImagen = async (req,res)=>{
 
 
 
-    }catch(error){
+    } catch (error) {
 
         console.log("ERROR:");
         console.log(error);
