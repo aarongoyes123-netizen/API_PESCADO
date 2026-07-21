@@ -21,9 +21,9 @@ from tensorflow.keras.models import load_model
 print("TensorFlow importado", file=sys.stderr, flush=True)
 
 
-print("Cargando YOLO...", flush=True)
+#*print("Cargando YOLO...", file=sys.stderr, flush=True)
 
-modelo_yolo = YOLO("src/modelos/best.pt")
+modelo_yolo = None
 
 print("YOLO cargado", flush=True)
 
