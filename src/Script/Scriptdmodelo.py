@@ -4,6 +4,9 @@ import cv2
 import numpy as np
 import os
 
+os.environ["YOLO_CONFIG_DIR"]="/tmp"
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
+
 print("Python iniciado", file=sys.stderr, flush=True)
 
 
@@ -14,7 +17,6 @@ print("YOLO importado", file=sys.stderr, flush=True)
 
 print("Antes TensorFlow", file=sys.stderr, flush=True)
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 print("Saltando TensorFlow", file=sys.stderr, flush=True)
 
@@ -24,8 +26,13 @@ print("TensorFlow importado", file=sys.stderr, flush=True)
 
 
 #*print("Cargando YOLO...", file=sys.stderr, flush=True)
+print("Cargando YOLO...", file=sys.stderr, flush=True)
 
-modelo_yolo = None
+modelo_yolo = YOLO(
+    "src/modelos/best.pt"
+)
+
+print("YOLO cargado correctamente", file=sys.stderr, flush=True)
 
 print("YOLO cargado", flush=True)
 
