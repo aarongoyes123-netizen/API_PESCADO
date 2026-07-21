@@ -25,7 +25,6 @@ modelo_clasificacion = None
 print("TensorFlow importado", file=sys.stderr, flush=True)
 
 
-#*print("Cargando YOLO...", file=sys.stderr, flush=True)
 print("Cargando YOLO...", file=sys.stderr, flush=True)
 
 modelo_yolo = YOLO(
@@ -34,16 +33,11 @@ modelo_yolo = YOLO(
 
 print("YOLO cargado correctamente", file=sys.stderr, flush=True)
 
-print("YOLO cargado", flush=True)
+print("YOLO cargado", file=sys.stderr, flush=True)
 
+print("Cargando clasificación...", file=sys.stderr, flush=True)
 
-print("Cargando clasificación...", flush=True)
-
-#*modelo_clasificacion = load_model(
-    #"src/modelos/modelo_clasificacion.keras"
-#)
-
-print("Clasificador cargado", flush=True)
+print("Clasificador cargado", file=sys.stderr, flush=True)
 # Clases del modelo de clasificación
 class_names = [
     "deteriorado",
