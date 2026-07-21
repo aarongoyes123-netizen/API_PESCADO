@@ -16,7 +16,9 @@ print("Antes TensorFlow", file=sys.stderr, flush=True)
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-from tensorflow.keras.models import load_model
+print("Saltando TensorFlow", file=sys.stderr, flush=True)
+
+modelo_clasificacion = None
 
 print("TensorFlow importado", file=sys.stderr, flush=True)
 
@@ -30,9 +32,9 @@ print("YOLO cargado", flush=True)
 
 print("Cargando clasificación...", flush=True)
 
-modelo_clasificacion = load_model(
-    "src/modelos/modelo_clasificacion.keras"
-)
+#*modelo_clasificacion = load_model(
+    #"src/modelos/modelo_clasificacion.keras"
+#)
 
 print("Clasificador cargado", flush=True)
 # Clases del modelo de clasificación
