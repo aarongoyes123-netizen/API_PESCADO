@@ -37,30 +37,52 @@ function ejecutarModelo(rutaImagen) {
     });
 }
 
-export const subirImagen = async (req, res) => {
+export const subirImagen = async (req,res)=>{
 
-    if (!req.file) {
-        return res.status(400).json({
-            mensaje: "No hay imagen"
+    try {
+
+        console.log("1. Entró al controlador");
+
+
+        if(!req.file){
+            console.log("No llegó archivo");
+
+            return res.status(400).json({
+                mensaje:"No hay imagen"
+            });
+        }
+
+
+        console.log("2. Imagen:");
+        console.log(req.file.path);
+
+
+
+        res.status(200).json({
+            mensaje:"Imagen recibida",
+            estado:"procesando"
         });
+
+
+
+        console.log("3. Antes de ejecutar Python");
+
+
+        const resultadoModelo =
+            await ejecutarModelo(req.file.path);
+
+
+
+        console.log("4. Resultado:");
+        console.log(resultadoModelo);
+
+
+
+    }catch(error){
+
+        console.log("ERROR:");
+        console.log(error);
+
     }
-
-
-    // responder inmediatamente
-    res.status(200).json({
-        mensaje: "Imagen recibida",
-        estado: "procesando"
-    });
-
-
-    // ejecutar después
-    ejecutarModelo(req.file.path)
-        .then(resultado => {
-            console.log(resultado);
-        })
-        .catch(err => {
-            console.log(err);
-        });
-
 
 };
