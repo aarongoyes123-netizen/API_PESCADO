@@ -1,6 +1,9 @@
-import cloudinary from '../config.js';
+import cloudinary from '../config.js'; // Asegúrate de que este archivo exporta la instancia configurada (v2)
 import { spawn } from 'child_process';
 
+// ==========================
+// FUNCIÓN PARA EJECUTAR PYTHON
+// ==========================
 function ejecutarModelo(rutaImagen) {
     return new Promise((resolve, reject) => {
 
@@ -28,14 +31,14 @@ function ejecutarModelo(rutaImagen) {
             }
 
             try {
-                // 💡 SOLUCIÓN: Buscamos la posición del primer carácter '{'
+                // Buscamos la posición del primer carácter '{'
                 const inicioJson = salida.indexOf('{');
                 
                 if (inicioJson === -1) {
                     throw new Error("No se encontró ningún JSON en la salida de Python.");
                 }
 
-                // 💡 Extraemos el texto desde la primera llave '{' hasta el final
+                // Extraemos el texto desde la primera llave '{' hasta el final
                 const jsonLimpio = salida.substring(inicioJson);
                 
                 // Parseamos únicamente el JSON limpio
@@ -44,55 +47,59 @@ function ejecutarModelo(rutaImagen) {
             } catch (e) {
                 reject(new Error('La salida del script no es un JSON válido. Detalles: ' + e.message));
             }
-
         });
-
     });
 }
 
+// ==========================
+// CONTROLADOR PRINCIPAL
+// ==========================
 export const subirImagen = async (req, res) => {
 
     try {
-
         console.log("1. Entró al controlador");
 
         if (!req.file) {
             console.log("No llegó archivo");
             return res.status(400).json({
+                success: false,
                 mensaje: "No hay imagen"
             });
         }
 
-        console.log("2. Imagen:");
-        console.log(req.file.path);
+        const rutaImagenLocal = req.file.path;
+        console.log("2. Imagen guardada temporalmente en:", rutaImagenLocal);
 
-        // OJO: Al responder aquí al cliente, la conexión HTTP se cierra.
-        // El cliente recibirá este mensaje, pero NO recibirá el resultado del modelo.
-        // El modelo se ejecutará en segundo plano y verás el resultado en tu consola de Render.
-        res.status(200).json({
-            mensaje: "Imagen recibida",
-            estado: "procesando"
+        // 3. Subir la imagen a Cloudinary
+        console.log("3. Subiendo imagen a Cloudinary...");
+        const resultadoCloudinary = await cloudinary.uploader.upload(rutaImagenLocal, {
+            folder: 'analisis_imagenes' // Opcional: crea una carpeta en tu Cloudinary
+        });
+        console.log("-> Imagen subida con éxito:", resultadoCloudinary.secure_url);
+
+        // 4. Ejecutar el script de Python con la imagen local
+        console.log("4. Ejecutando modelo Python...");
+        const resultadoModelo = await ejecutarModelo(rutaImagenLocal);
+        console.log("-> Resultado del modelo obtenido");
+
+        // 5. Enviar la respuesta final al cliente (ESP32)
+        // Ahora tu ESP32 imprimirá este JSON completo en el Monitor Serie
+        return res.status(200).json({
+            success: true,
+            mensaje: "Análisis completado",
+            imagen_url: resultadoCloudinary.secure_url,
+            datos_ia: resultadoModelo
         });
 
-        console.log("3. Antes de ejecutar Python");
-
-        const resultadoModelo = await ejecutarModelo(req.file.path);
-
-        console.log("4. Resultado:");
-        console.log(resultadoModelo);
-
-        // ⚠️ Si deseas enviar el resultado del modelo al frontend, debes quitar 
-        // el res.status(200) de arriba y usar esto en su lugar:
-        // return res.status(200).json(resultadoModelo);
-
     } catch (error) {
-
-        console.log("ERROR:");
+        console.log("ERROR EN CONTROLADOR:");
         console.log(error);
 
-        // Es buena práctica devolver un error al cliente si algo falla,
-        // siempre y cuando no hayas enviado ya un res.status() arriba.
-        // res.status(500).json({ error: error.message });
+        return res.status(500).json({
+            success: false,
+            mensaje: "Error interno del servidor",
+            error: error.message
+        });
     }
 
 };
