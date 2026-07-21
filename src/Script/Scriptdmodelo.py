@@ -66,27 +66,28 @@ def clasificar_imagen(imagen):
 # DETECCIÓN CON YOLO
 # ==========================
 
-def detectar_regiones(ruta_imagen):
+# ==========================
+# DETECCIÓN CON YOLO
+# ==========================
 
+def detectar_regiones(ruta_imagen):
     imagen = cv2.imread(ruta_imagen)
 
     if imagen is None:
         return None, []
 
-    resultados = modelo_yolo(ruta_imagen)
+    # 🚨 EL CAMBIO CLAVE ESTÁ AQUÍ 🚨
+    # Le pasamos la variable 'imagen' (matriz) en vez de 'ruta_imagen' (texto)
+    # y apagamos los mensajes molestos de YOLO con verbose=False
+    resultados = modelo_yolo(imagen, verbose=False)
 
     regiones = []
 
     for resultado in resultados:
-
         for box in resultado.boxes:
-
             clase = int(box.cls[0])
-
             nombre = resultado.names[clase]
-
             confianza = float(box.conf[0])
-
             x1, y1, x2, y2 = map(int, box.xyxy[0])
 
             # Evitar coordenadas fuera de la imagen
