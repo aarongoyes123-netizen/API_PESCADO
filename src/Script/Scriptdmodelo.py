@@ -2,16 +2,23 @@ import sys
 import json
 import cv2
 import numpy as np
+import os
 
-print("Python iniciado", flush=True)
+print("Python iniciado", file=sys.stderr, flush=True)
+
 
 from ultralytics import YOLO
 
-print("YOLO importado", flush=True)
+print("YOLO importado", file=sys.stderr, flush=True)
+
+
+print("Antes TensorFlow", file=sys.stderr, flush=True)
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 from tensorflow.keras.models import load_model
 
-print("TensorFlow importado", flush=True)
+print("TensorFlow importado", file=sys.stderr, flush=True)
 
 
 print("Cargando YOLO...", flush=True)
