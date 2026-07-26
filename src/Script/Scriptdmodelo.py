@@ -14,7 +14,7 @@ print("YOLO importado", file=sys.stderr, flush=True)
 
 # 🚨 CAMBIO: Importar TensorFlow correctamente 🚨
 print("Importando TensorFlow...", file=sys.stderr, flush=True)
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 print("TensorFlow importado", file=sys.stderr, flush=True)
 
 print("Cargando YOLO...", file=sys.stderr, flush=True)
@@ -22,10 +22,18 @@ modelo_yolo = YOLO("src/modelos/best.pt")
 print("YOLO cargado correctamente", file=sys.stderr, flush=True)
 
 # 🚨 CAMBIO: Cargar el modelo de clasificación Keras 🚨
-print("Cargando clasificación...", file=sys.stderr, flush=True)
-modelo_clasificacion = load_model("src/modelos/modelo_clasificacion.keras")
-print("Clasificador cargado", file=sys.stderr, flush=True)
+print("Cargando modelo TFLite...", file=sys.stderr, flush=True)
 
+interpreter = tf.lite.Interpreter(
+    model_path="src/modelos/modelo_clasificacion.tflite"
+)
+
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+print("Modelo TFLite cargado correctamente", file=sys.stderr, flush=True)
 # Clases del modelo de clasificación
 class_names = [
     "deteriorado",
@@ -37,12 +45,34 @@ class_names = [
 # CLASIFICADOR
 # ==========================
 def clasificar_imagen(imagen):
+
+    # Redimensionar
     imagen = cv2.resize(imagen, (224, 224))
+
+    # BGR -> RGB
+    imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2RGB)
+
+    # float32
+    imagen = imagen.astype(np.float32)
+
+    # Batch
     imagen = np.expand_dims(imagen, axis=0)
-    pred = modelo_clasificacion.predict(imagen, verbose=0)
-    indice = np.argmax(pred)
-    confianza = float(np.max(pred))
-    
+
+    # Ejecutar inferencia
+    interpreter.set_tensor(
+        input_details[0]["index"],
+        imagen
+    )
+
+    interpreter.invoke()
+
+    pred = interpreter.get_tensor(
+        output_details[0]["index"]
+    )[0]
+
+    indice = int(np.argmax(pred))
+    confianza = float(pred[indice])
+
     return class_names[indice], confianza
 
 # ==========================
