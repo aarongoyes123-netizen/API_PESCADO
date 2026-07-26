@@ -1,4 +1,4 @@
 ultralytics
-tensorflow==2.19.0
+tflite-runtime
 opencv-python-headless
 numpy
