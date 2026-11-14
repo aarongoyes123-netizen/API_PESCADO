@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import os
 
-os.environ["YOLO_CONFIG_DIR"]="/tmp"
+os.environ["YOLO_CONFIG_DIR"]="/tmp"#establece la variable de entorno para la configuración de YOLO
 
 print("Python iniciado", file=sys.stderr, flush=True)
 
@@ -38,13 +38,13 @@ class_names = [
 ]
 
 def clasificar_imagen(imagen):
-    imagen = cv2.resize(imagen, (224, 224))
-    imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2RGB)
+    imagen = cv2.resize(imagen, (224, 224))#redimensiona la imagen a 224x224 píxeles
+    imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2RGB)#convierte la imagen de BGR a RGB
     imagen = imagen.astype(np.float32)
     imagen = np.expand_dims(imagen, axis=0)
 
-    interpreter.set_tensor(input_details[0]["index"], imagen)
-    interpreter.invoke()
+    interpreter.set_tensor(input_details[0]["index"], imagen)#carga la imagen en la entrada del modelo
+    interpreter.invoke()#ejecuta la inferencia del modelo
 
     pred = interpreter.get_tensor(output_details[0]["index"])[0]
 
@@ -54,7 +54,7 @@ def clasificar_imagen(imagen):
     return class_names[indice], confianza
 
 def detectar_regiones(ruta_imagen):
-    imagen = cv2.imread(ruta_imagen)
+    imagen = cv2.imread(ruta_imagen)#lee la imagen desde la ruta especificada
     if imagen is None:
         return None, []
 
