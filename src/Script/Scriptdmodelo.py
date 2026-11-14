@@ -12,16 +12,16 @@ from ultralytics import YOLO
 print("YOLO importado", file=sys.stderr, flush=True)
 
 # 🚨 CAMBIO CLAVE AQUÍ: Usar tflite_runtime en lugar de tensorflow completo
-print("Importando tflite_runtime...", file=sys.stderr, flush=True)
-import tflite_runtime.interpreter as tflite
-print("tflite_runtime importado", file=sys.stderr, flush=True)
+print("Importando LiteRT...", file=sys.stderr, flush=True)
+from ai_edge_litert.interpreter import Interpreter
+print("LiteRT importado", file=sys.stderr, flush=True)
 
 print("Cargando YOLO...", file=sys.stderr, flush=True)
 modelo_yolo = YOLO("src/modelos/best.pt")
 print("YOLO cargado correctamente", file=sys.stderr, flush=True)
 
 print("Cargando modelo TFLite...", file=sys.stderr, flush=True)
-interpreter = tflite.Interpreter(
+interpreter = Interpreter(
     model_path="src/modelos/modelo_clasificacion.tflite"
 )
 interpreter.allocate_tensors()
