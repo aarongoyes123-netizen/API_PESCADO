@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { subirImagen } from '../Controladores/imagenCtrl.js';
+import { subirImagen, obtenerResultado, estadoServidor } from '../Controladores/imagenCtrl.js';
 
 const router = Router();
 
@@ -9,5 +9,7 @@ const upload = multer({
 });
 
 router.post('/subir', upload.single('imagen'), subirImagen);
+router.get('/resultado/:id', obtenerResultado);
+router.get('/estado', estadoServidor);
 
 export default router;

@@ -4,14 +4,13 @@ import cv2
 import numpy as np
 import os
 
-os.environ["YOLO_CONFIG_DIR"]="/tmp"#establece la variable de entorno para la configuración de YOLO
+os.environ["YOLO_CONFIG_DIR"] = "/tmp"  # establece la variable de entorno para la configuracion de YOLO
 
 print("Python iniciado", file=sys.stderr, flush=True)
 
 from ultralytics import YOLO
 print("YOLO importado", file=sys.stderr, flush=True)
 
-# 🚨 CAMBIO CLAVE AQUÍ: Usar tflite_runtime en lugar de tensorflow completo
 print("Importando LiteRT...", file=sys.stderr, flush=True)
 from ai_edge_litert.interpreter import Interpreter
 print("LiteRT importado", file=sys.stderr, flush=True)
@@ -37,14 +36,15 @@ class_names = [
     "regular"
 ]
 
+
 def clasificar_imagen(imagen):
-    imagen = cv2.resize(imagen, (224, 224))#redimensiona la imagen a 224x224 píxeles
-    imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2RGB)#convierte la imagen de BGR a RGB
+    imagen = cv2.resize(imagen, (224, 224))  # redimensiona la imagen a 224x224 pixeles
+    imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2RGB)  # convierte la imagen de BGR a RGB
     imagen = imagen.astype(np.float32)
     imagen = np.expand_dims(imagen, axis=0)
 
-    interpreter.set_tensor(input_details[0]["index"], imagen)#carga la imagen en la entrada del modelo
-    interpreter.invoke()#ejecuta la inferencia del modelo
+    interpreter.set_tensor(input_details[0]["index"], imagen)  # carga la imagen en la entrada del modelo
+    interpreter.invoke()  # ejecuta la inferencia del modelo
 
     pred = interpreter.get_tensor(output_details[0]["index"])[0]
 
@@ -53,8 +53,9 @@ def clasificar_imagen(imagen):
 
     return class_names[indice], confianza
 
+
 def detectar_regiones(ruta_imagen):
-    imagen = cv2.imread(ruta_imagen)#lee la imagen desde la ruta especificada
+    imagen = cv2.imread(ruta_imagen)  # lee la imagen desde la ruta especificada
     if imagen is None:
         return None, []
 
@@ -85,6 +86,7 @@ def detectar_regiones(ruta_imagen):
 
     return imagen, regiones
 
+
 def procesar_imagen(ruta_imagen):
     imagen, regiones = detectar_regiones(ruta_imagen)
 
@@ -99,7 +101,7 @@ def procesar_imagen(ruta_imagen):
     for region in regiones:
         clase_detectada = region["clase"]
         roi = region["roi"]
-        
+
         clase_predicha, confianza = clasificar_imagen(roi)
 
         resultados.append({
@@ -115,15 +117,35 @@ def procesar_imagen(ruta_imagen):
         "resultados": resultados
     }
 
+
+def modo_servidor():
+    """Modelos ya cargados: lee una ruta por linea y responde un JSON por linea."""
+    print(json.dumps({"listo": True}), flush=True)
+    for linea in sys.stdin:
+        ruta = linea.strip()
+        if not ruta:
+            continue
+        try:
+            respuesta = procesar_imagen(ruta)
+        except Exception as e:
+            respuesta = {"success": False, "mensaje": str(e)}
+        print(json.dumps(respuesta), flush=True)
+
+
 if __name__ == "__main__":
     try:
+        if len(sys.argv) >= 2 and sys.argv[1] == "--servidor":
+            modo_servidor()
+            sys.exit(0)
+
         if len(sys.argv) < 2:
             print(json.dumps({
                 "success": False,
-                "mensaje": "No se recibió la ruta de la imagen."
+                "mensaje": "No se recibio la ruta de la imagen."
             }))
             sys.exit()
 
+        # Modo anterior (una imagen por ejecucion), util para pruebas manuales
         ruta = sys.argv[1]
         respuesta = procesar_imagen(ruta)
         print(json.dumps(respuesta))
